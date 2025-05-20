@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Site {
+  id          String @id @default(cuid())
+  subdomain   String @unique
+  name        String
+  description String
+
+  ownerId String? @unique
+  owner   Owner?  @relation(fields: [ownerId], references: [id])
+
+  themeId String? @unique
+  theme   Theme?  @relation(fields: [themeId], references: [id])
+
+  contactId String?  @unique
+  contact   Contact? @relation(fields: [contactId], references: [id])
+
+  socialMediaId String?      @unique
+  socialMedia   SocialMedia? @relation(fields: [socialMediaId], references: [id])
+
+  heroId String? @unique
+  hero   Hero?   @relation(fields: [heroId], references: [id])
+
+  services  Service[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  githubRepoUrl    String?
+  vercelProjectUrl String?
+}
+
+model Owner {
+  id    String  @id @default(cuid())
+  name  String
+  email String
+  phone String?
+  site  Site?
+}
+
+model Theme {
+  id             String @id @default(cuid())
+  primaryColor   String
+  secondaryColor String
+  site           Site?
+}
+
+model Contact {
+  id           String   @id @default(cuid())
+  address      String?
+  city         String?
+  phone        String?
+  email        String?
+  workingHours String?
+  areas        String[]
+  site         Site?
+}
+
+model Service {
+  id          String @id @default(cuid())
+  title       String
+  description String
+  price       String
+  site        Site   @relation(fields: [siteId], references: [id])
+  siteId      String
+}
+
+model SocialMedia {
+  id        String  @id @default(cuid())
+  facebook  String?
+  instagram String?
+  linkedin  String?
+  site      Site?
+}
+
+model Hero {
+  id           String   @id @default(cuid())
+  mainTitle    String?
+  subtitle     String?
+  highlights   String[]
+  ctaPrimary   String?
+  ctaSecondary String?
+  site         Site?
+}
