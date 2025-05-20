@@ -13,10 +13,10 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Save, Copy, Mail, Edit2, Check } from "lucide-react";
-import { toast } from "sonner";
 import { SiteConfig } from "@/types/site";
 import { scrapeAndAnalyzeWebsite } from "@/app/actions/scraper/scraperActions";
 import { saveSiteConfig } from "@/app/actions/database/siteConfigActions";
+import { toast } from "sonner";
 
 interface RecipientInfo {
   name: string;

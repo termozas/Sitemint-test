@@ -1,17 +1,21 @@
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
-import { DataTable } from "@/components/data-table";
-import { SectionCards } from "@/components/section-cards";
-import data from "@/app/dashboard/projects/data.json";
+import { SitesDataTable } from "@/components/sites-data-table";
+import { prisma } from "@/lib/prisma";
 
-export default function Page() {
+export default async function Page() {
+  const sites = await prisma.site.findMany({
+    include: {
+      owner: true,
+      contact: true,
+      socialMedia: true,
+    },
+  });
+
   return (
     <div className="@container/main flex flex-1 flex-col gap-2">
       <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-        <SectionCards />
         <div className="px-4 lg:px-6">
-          <ChartAreaInteractive />
+          <SitesDataTable sites={sites} />
         </div>
-        <DataTable data={data} />
       </div>
     </div>
   );
