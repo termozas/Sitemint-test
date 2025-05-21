@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { useBreadcrumb } from "@/lib/contexts/BreadcrumbContext";
 
 // Helper function to capitalize first letter
 const capitalizeFirstLetter = (string: string) => {
@@ -21,6 +22,7 @@ const capitalizeFirstLetter = (string: string) => {
 export function SiteHeader() {
   const pathname = usePathname();
   const segments = pathname.split("/").filter(Boolean); // Split path and remove empty strings
+  const { pageTitle } = useBreadcrumb();
 
   // Determine the base path and name for the first breadcrumb link
   const basePath = "/dashboard";
@@ -43,7 +45,14 @@ export function SiteHeader() {
             {segments.slice(1).map((segment, index) => {
               const isLast = index === segments.length - 2;
               const href = `/${segments.slice(0, index + 2).join("/")}`;
-              const name = capitalizeFirstLetter(segment.replace(/-/g, " ")); // Replace hyphens and capitalize
+              const name =
+                isLast &&
+                pageTitle &&
+                segments[0] === "dashboard" &&
+                segments[1] === "projects" &&
+                segments.length === 3
+                  ? pageTitle
+                  : capitalizeFirstLetter(segment.replace(/-/g, " "));
 
               return (
                 <React.Fragment key={href}>

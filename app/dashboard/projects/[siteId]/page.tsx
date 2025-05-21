@@ -1,34 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  IconAlertTriangle,
-  IconBrandFacebook,
-  IconBrandInstagram,
-  IconBrandLinkedin,
-  IconBriefcase,
-  IconBuildingStore,
-  IconCalendarEvent,
-  IconExternalLink,
-  IconGitFork,
-  IconGlobe,
-  IconLink,
-  IconMail,
-  IconMapPin,
-  IconPhone,
-  IconShieldCheck,
-  IconStar,
-  IconUser,
-  IconWorldWww,
-} from "@tabler/icons-react";
+import { IconAlertTriangle, IconExternalLink } from "@tabler/icons-react";
 import Link from "next/link";
+import { SiteInfoEditor } from "@/components/project-edit/SiteInfoEditor";
+import { OwnerInfoEditor } from "@/components/project-edit/OwnerInfoEditor";
+import { ContactInfoEditor } from "@/components/project-edit/ContactInfoEditor";
+import { SocialMediaEditor } from "@/components/project-edit/SocialMediaEditor";
+import { HeroContentEditor } from "@/components/project-edit/HeroContentEditor";
+import { SetPageTitle } from "@/components/set-page-title";
 
 interface ProjectDetailsPageProps {
   params: {
@@ -47,7 +28,7 @@ export default async function ProjectDetailsPage({
       socialMedia: true,
       hero: true,
       services: true,
-      theme: true, // Assuming you might want to use theme colors later
+      theme: true,
     },
   });
 
@@ -58,6 +39,7 @@ export default async function ProjectDetailsPage({
   return (
     <div className="@container/main flex flex-1 flex-col">
       {/* Page Header */}
+      <SetPageTitle title={site.name} />
       <div className=" px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col items-start gap-y-4 md:flex-row md:items-center md:justify-between">
@@ -94,281 +76,35 @@ export default async function ProjectDetailsPage({
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
           {/* Sidebar Column */}
           <aside className="space-y-6 lg:col-span-4">
-            {/* Owner Details Card */}
-            {site.owner && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center text-lg">
-                    <IconUser className="mr-2.5 size-5 text-muted-foreground" />
-                    Owner Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center">
-                    <p className="font-medium">{site.owner.name}</p>
-                  </div>
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <IconMail className="mr-2 size-4 shrink-0" />
-                    <a
-                      href={`mailto:${site.owner.email}`}
-                      className="hover:text-foreground hover:underline"
-                    >
-                      {site.owner.email}
-                    </a>
-                  </div>
-                  {site.owner.phone && (
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <IconPhone className="mr-2 size-4 shrink-0" />
-                      <span>{site.owner.phone}</span>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
+            {/* Owner Details Card - Replaced with Editor */}
+            <OwnerInfoEditor siteId={site.id} initialData={site.owner} />
 
-            {/* Contact Details Card */}
-            {site.contact && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center text-lg">
-                    <IconBriefcase className="mr-2.5 size-5 text-muted-foreground" />
-                    Contact Details
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {site.contact.address && (
-                    <div className="flex items-start text-sm text-muted-foreground">
-                      <IconMapPin className="mr-2 mt-0.5 size-4 shrink-0" />
-                      <span>
-                        {site.contact.address}, {site.contact.city}
-                      </span>
-                    </div>
-                  )}
-                  {site.contact.email && (
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <IconMail className="mr-2 size-4 shrink-0" />
-                      <a
-                        href={`mailto:${site.contact.email}`}
-                        className="hover:text-foreground hover:underline"
-                      >
-                        {site.contact.email}
-                      </a>
-                    </div>
-                  )}
-                  {site.contact.phone && (
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <IconPhone className="mr-2 size-4 shrink-0" />
-                      <span>{site.contact.phone}</span>
-                    </div>
-                  )}
-                  {site.contact.workingHours && (
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <IconCalendarEvent className="mr-2 size-4 shrink-0" />
-                      <span>{site.contact.workingHours}</span>
-                    </div>
-                  )}
-                  {site.contact.areas && site.contact.areas.length > 0 && (
-                    <div className="pt-1">
-                      <h4 className="mb-1.5 text-xs font-medium uppercase text-muted-foreground">
-                        Service Areas
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {site.contact.areas.map((area) => (
-                          <Badge
-                            key={area}
-                            variant="secondary"
-                            className="font-normal"
-                          >
-                            {area}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
+            {/* Contact Details Card - Replaced with Editor */}
+            <ContactInfoEditor siteId={site.id} initialData={site.contact} />
 
-            {/* Social Media Card */}
-            {site.socialMedia &&
-              (site.socialMedia.facebook ||
-                site.socialMedia.instagram ||
-                site.socialMedia.linkedin) && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center text-lg">
-                      <IconGlobe className="mr-2.5 size-5 text-muted-foreground" />
-                      Social Media
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2.5">
-                    {site.socialMedia.facebook && (
-                      <Link
-                        href={site.socialMedia.facebook}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center text-sm text-muted-foreground hover:text-foreground hover:underline"
-                      >
-                        <IconBrandFacebook className="mr-2 size-4 shrink-0 text-[#1877F2]" />
-                        Facebook
-                      </Link>
-                    )}
-                    {site.socialMedia.instagram && (
-                      <Link
-                        href={site.socialMedia.instagram}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center text-sm text-muted-foreground hover:text-foreground hover:underline"
-                      >
-                        <IconBrandInstagram className="mr-2 size-4 shrink-0 text-[#E4405F]" />
-                        Instagram
-                      </Link>
-                    )}
-                    {site.socialMedia.linkedin && (
-                      <Link
-                        href={site.socialMedia.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center text-sm text-muted-foreground hover:text-foreground hover:underline"
-                      >
-                        <IconBrandLinkedin className="mr-2 size-4 shrink-0 text-[#0A66C2]" />
-                        LinkedIn
-                      </Link>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
+            {/* Social Media Card - Replaced with Editor */}
+            <SocialMediaEditor
+              siteId={site.id}
+              initialData={site.socialMedia}
+            />
           </aside>
 
           {/* Main Content Column */}
           <main className="space-y-6 lg:col-span-8">
-            {/* Site Information Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center text-lg">
-                  <IconBuildingStore className="mr-2.5 size-5 text-muted-foreground" />
-                  Site Information
-                </CardTitle>
-                {site.description && (
-                  <CardDescription>{site.description}</CardDescription>
-                )}
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {site.subdomain && (
-                  <div className="flex items-center text-sm">
-                    <IconWorldWww className="mr-2 size-4 shrink-0 text-muted-foreground" />
-                    <span className="font-medium text-muted-foreground mr-1">
-                      Subdomain:
-                    </span>
-                    <Link
-                      // Assuming local development with .localhost:3000, replace if different
-                      href={`http://${site.subdomain}.localhost:3000`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline dark:text-blue-400"
-                    >
-                      {site.subdomain}
-                    </Link>
-                  </div>
-                )}
-                {site.githubRepoUrl && (
-                  <div className="flex items-center text-sm">
-                    <IconGitFork className="mr-2 size-4 shrink-0 text-muted-foreground" />
-                    <span className="font-medium text-muted-foreground mr-1">
-                      GitHub:
-                    </span>
-                    <Link
-                      href={site.githubRepoUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="truncate text-blue-600 hover:underline dark:text-blue-400"
-                    >
-                      Repository
-                    </Link>
-                  </div>
-                )}
-                {site.vercelProjectUrl && (
-                  <div className="flex items-center text-sm">
-                    <IconLink className="mr-2 size-4 shrink-0 text-muted-foreground" />
-                    <span className="font-medium text-muted-foreground mr-1">
-                      Deployment:
-                    </span>
-                    <Badge
-                      variant="default"
-                      className="bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400 border-green-600/50"
-                    >
-                      <IconShieldCheck className="mr-1 size-3.5" />
-                      Deployed
-                    </Badge>
-                  </div>
-                )}
-                {!site.vercelProjectUrl && (
-                  <div className="flex items-center text-sm">
-                    <IconLink className="mr-2 size-4 shrink-0 text-muted-foreground" />
-                    <span className="font-medium text-muted-foreground mr-1">
-                      Deployment:
-                    </span>
-                    <Badge variant="outline">
-                      <IconAlertTriangle className="mr-1 size-3.5 text-amber-500" />
-                      Not Deployed
-                    </Badge>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            {/* Site Information Card - Replaced with Editor */}
+            <SiteInfoEditor
+              initialData={{
+                id: site.id,
+                name: site.name,
+                description: site.description,
+                subdomain: site.subdomain,
+                githubRepoUrl: site.githubRepoUrl,
+                vercelProjectUrl: site.vercelProjectUrl,
+              }}
+            />
 
-            {/* Hero Section Card */}
-            {site.hero && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center text-lg">
-                    <IconStar className="mr-2.5 size-5 text-muted-foreground" />
-                    Hero Section
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {site.hero.mainTitle && (
-                    <h3 className="text-xl font-semibold text-foreground">
-                      {site.hero.mainTitle}
-                    </h3>
-                  )}
-                  {site.hero.subtitle && (
-                    <p className="text-muted-foreground">
-                      {site.hero.subtitle}
-                    </p>
-                  )}
-                  {site.hero.highlights && site.hero.highlights.length > 0 && (
-                    <div>
-                      <h4 className="mb-1.5 text-xs font-medium uppercase text-muted-foreground">
-                        Highlights
-                      </h4>
-                      <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
-                        {site.hero.highlights.map((highlight, index) => (
-                          <li key={index}>{highlight}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {(site.hero.ctaPrimary || site.hero.ctaSecondary) && (
-                    <div className="flex flex-wrap gap-3 pt-2">
-                      {site.hero.ctaPrimary && (
-                        <Badge variant="default" className="px-3 py-1 text-sm">
-                          {site.hero.ctaPrimary}
-                        </Badge>
-                      )}
-                      {site.hero.ctaSecondary && (
-                        <Badge
-                          variant="secondary"
-                          className="px-3 py-1 text-sm"
-                        >
-                          {site.hero.ctaSecondary}
-                        </Badge>
-                      )}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
+            {/* Hero Section Card - Replaced with Editor */}
+            <HeroContentEditor siteId={site.id} initialData={site.hero} />
 
             {/* Services Card */}
             {site.services && site.services.length > 0 && (
