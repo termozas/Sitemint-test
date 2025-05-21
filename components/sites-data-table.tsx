@@ -21,6 +21,7 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconChevronsRight,
+  IconEye,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
 import {
@@ -40,6 +41,7 @@ import type {
 } from "@/generated/prisma/client";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { deploySiteToVercel } from "@/app/actions/deploy/deploymentActions";
+import Link from "next/link";
 
 interface SiteWithRelations extends Site {
   owner: Owner | null;
@@ -100,7 +102,14 @@ export const columns: ColumnDef<SiteWithRelations>[] = [
   {
     accessorKey: "name",
     header: "Business Name",
-    cell: ({ row }) => <div className="font-medium">{row.original.name}</div>,
+    cell: ({ row }) => (
+      <Link
+        href={`/dashboard/projects/${row.original.id}`}
+        className="font-medium text-blue-600 hover:underline dark:text-blue-400"
+      >
+        {row.original.name}
+      </Link>
+    ),
   },
   {
     accessorKey: "subdomain",
@@ -164,6 +173,11 @@ export const columns: ColumnDef<SiteWithRelations>[] = [
       const site = row.original;
       return (
         <div className="flex gap-2 justify-end">
+          <Button variant="outline" size="sm" asChild title="View Details">
+            <Link href={`/dashboard/projects/${site.id}`}>
+              <IconEye className="h-4 w-4" />
+            </Link>
+          </Button>
           <Button
             variant="outline"
             size="sm"
