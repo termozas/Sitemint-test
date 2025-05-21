@@ -3,7 +3,7 @@
 import { SiteConfig } from "@/types/site";
 import { prisma } from "@/lib/prisma";
 
-export async function saveSiteConfig(siteConfig: SiteConfig): Promise<void> {
+export async function saveSiteConfig(siteConfig: SiteConfig): Promise<string> {
   console.log("💾 Starting to save site configuration to database...");
   try {
     const {
@@ -137,6 +137,7 @@ export async function saveSiteConfig(siteConfig: SiteConfig): Promise<void> {
       socialMediaId: savedSite.socialMediaId,
       heroId: savedSite.heroId,
     });
+    return savedSite.id;
   } catch (error) {
     console.error("❌ Error saving site configuration to database:", error);
     throw new Error("Failed to save site configuration to database");

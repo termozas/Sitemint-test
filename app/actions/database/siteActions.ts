@@ -205,3 +205,79 @@ export async function updateSiteDetails(
     };
   }
 }
+
+export async function deleteSite(siteId: string): Promise<{
+  success: boolean;
+  message: string;
+}> {
+  console.log(`🗑️ Attempting to delete site with ID: ${siteId}`);
+  try {
+    // Fetch site details to get IDs of related one-to-one entities
+    const site = await prisma.site.findUnique({
+      where: { id: siteId },
+      select: {
+        ownerId: true,
+        themeId: true,
+        contactId: true,
+        socialMediaId: true,
+        heroId: true,
+      },
+    });
+
+    if (!site) {
+      console.warn(`⚠️ Site with ID ${siteId} not found for deletion.`);
+      return { success: false, message: "Site not found." };
+    }
+
+    // Prisma transaction to ensure all or nothing deletion
+    await prisma.$transaction(async (tx) => {
+      console.log(`🧹 Starting cleanup for site ${siteId}...`);
+
+      // Services are deleted by onDelete: Cascade in schema
+
+      // Delete related one-to-one entities if they exist
+      if (site.ownerId) {
+        console.log(`   Deleting Owner: ${site.ownerId}`);
+        await tx.owner.delete({ where: { id: site.ownerId } });
+      }
+      if (site.themeId) {
+        console.log(`   Deleting Theme: ${site.themeId}`);
+        await tx.theme.delete({ where: { id: site.themeId } });
+      }
+      if (site.contactId) {
+        console.log(`   Deleting Contact: ${site.contactId}`);
+        await tx.contact.delete({ where: { id: site.contactId } });
+      }
+      if (site.socialMediaId) {
+        console.log(`   Deleting SocialMedia: ${site.socialMediaId}`);
+        await tx.socialMedia.delete({ where: { id: site.socialMediaId } });
+      }
+      if (site.heroId) {
+        console.log(`   Deleting Hero: ${site.heroId}`);
+        await tx.hero.delete({ where: { id: site.heroId } });
+      }
+
+      // Finally, delete the site itself
+      console.log(`🗑️ Deleting Site: ${siteId}`);
+      await tx.site.delete({ where: { id: siteId } });
+
+      console.log(
+        `✅ Site ${siteId} and its related data deleted successfully.`
+      );
+    });
+
+    revalidatePath("/dashboard/projects");
+    console.log("🔄 Path /dashboard/projects revalidated.");
+
+    return { success: true, message: "Site deleted successfully." };
+  } catch (error) {
+    console.error(`❌ Error deleting site ${siteId}:`, error);
+    let errorMessage = "Failed to delete site.";
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      errorMessage = `Prisma Error (${error.code}): ${error.message}`;
+    } else if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+    return { success: false, message: errorMessage };
+  }
+}

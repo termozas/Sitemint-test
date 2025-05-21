@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -56,6 +57,7 @@ E-post: post@codenord.no`;
 }
 
 export default function ScraperPage() {
+  const router = useRouter();
   const [url, setUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [scrapedData, setScrapedData] = useState<SiteConfig | null>(null);
@@ -97,10 +99,11 @@ export default function ScraperPage() {
     if (!editedData) return;
 
     try {
-      await saveSiteConfig(editedData);
+      const siteId = await saveSiteConfig(editedData);
       setScrapedData(editedData);
       setEmailContent(generateEmailContent(editedData, recipient));
       toast.success("Site configuration saved successfully!");
+      router.push(`/dashboard/projects/${siteId}`);
     } catch (error) {
       toast.error("Failed to save site configuration");
       console.error(error);
@@ -114,7 +117,7 @@ export default function ScraperPage() {
       if (!prev) return prev;
       const updated = { ...prev };
       const fields = field.split(".");
-      let current: any = updated;
+      let current: Record<string, any> = updated;
 
       for (let i = 0; i < fields.length - 1; i++) {
         current = current[fields[i]];
@@ -215,7 +218,7 @@ export default function ScraperPage() {
                   </Button>
                   <Button onClick={handleSave}>
                     <Save className="mr-2 h-4 w-4" />
-                    Save Config
+                    Save Website
                   </Button>
                 </div>
               </CardHeader>

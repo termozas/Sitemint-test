@@ -74,7 +74,7 @@ model Service {
   title       String
   description String
   price       String
-  site        Site   @relation(fields: [siteId], references: [id])
+  site        Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
   siteId      String
 }
 

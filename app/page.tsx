@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -25,7 +26,9 @@ export default function Home() {
             Save and see your changes instantly.
           </li>
         </ol>
-        <Link href="/dashboard">Dashboard</Link>
+        <Button asChild>
+          <Link href="/dashboard/maker">Dashboard</Link>
+        </Button>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
           <a
