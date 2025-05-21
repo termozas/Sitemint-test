@@ -39,6 +39,7 @@ import type {
   SocialMedia,
 } from "@/generated/prisma/client";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { deploySiteToVercel } from "@/app/actions/deploy/deploymentActions";
 
 interface SiteWithRelations extends Site {
   owner: Owner | null;
@@ -68,32 +69,21 @@ const handleSendEmail = (site: SiteWithRelations) => {
 };
 
 const handleDeploySite = async (siteId: string, siteName: string) => {
-  const promise: Promise<{
-    success: boolean;
-    data?: { repoHtmlUrl: string; projectUrl: string };
-    message?: string;
-  }> = new Promise((resolve) =>
-    setTimeout(() => {
-      resolve({
-        success: true,
-        message: `${siteName} deployed successfully!`,
-        data: {
-          repoHtmlUrl: "http://example.com/repo",
-          projectUrl: "http://example.com/site",
-        },
-      });
-    }, 2000)
-  );
+  const promise = deploySiteToVercel(siteId);
 
   toast.promise(promise, {
     loading: `Starting deployment for ${siteName}... This may take a few minutes. Please wait. `,
     success: (result: {
       success: boolean;
-      data?: { repoHtmlUrl: string; projectUrl: string };
+      data: { repoHtmlUrl: string; projectUrl?: string };
       message?: string;
     }) => {
-      if (result.success && result.data) {
-        return `${siteName} deployed successfully!\nRepo: ${result.data.repoHtmlUrl}\nSite: ${result.data.projectUrl}`;
+      if (result.success && result.data && result.data.repoHtmlUrl) {
+        let successMessage = `${siteName} deployed to GitHub successfully!\nRepo: ${result.data.repoHtmlUrl}`;
+        if (result.data.projectUrl) {
+          successMessage += `\nSite: ${result.data.projectUrl}`;
+        }
+        return successMessage;
       }
       return (
         result.message ||
